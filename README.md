@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Recursive Grid
+
+An interactive 3×3 grid with click-driven ripple propagation, built with **Next.js (App Router)**, **TypeScript**, and **Tailwind CSS v4**.
+
+## Features
+
+- **3×3 interactive grid** — click any cell to increment its value
+- **Ripple propagation** — divisible-by-3 decrements the right neighbour; divisible-by-5 increments the bottom neighbour by 2
+- **Dynamic colouring** — even (grey), odd (indigo), locked ≥ 15 (red)
+- **Locked cells** — cannot be clicked or modified by neighbours
+- **Reset button** — returns all cells to 0
+- **Ripple animation** — subtle pulse on affected neighbours
+- **Edge-safe** — all boundary checks handled, no crashes
+- **Immutable state** — functional updates, memoised components
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/
+│   ├── globals.css      # Tailwind + ripple animation keyframes
+│   ├── layout.tsx       # Root layout with Inter font
+│   └── page.tsx         # Home page — centres the grid
+├── components/
+│   ├── Grid.tsx         # State management + layout
+│   └── GridBox.tsx      # Single cell (memoised)
+├── utils/
+│   └── gridLogic.ts     # Pure functions: ripple, colours, predicates
+├── constants.ts         # Grid size, thresholds, box dimensions
+└── types.ts             # TypeScript type definitions
+```
 
-## Learn More
+## Architecture Decisions
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Decision | Rationale |
+|---|---|
+| Pure ripple function | Easily testable, no side effects |
+| Memoised `GridBox` | Prevents re-renders of unchanged cells |
+| Functional state update | Safe with React's batched updates |
+| Immutable grid cloning | Every `setCellValue` produces a new grid |
+| Ripple animation via CSS class | Zero JS animation overhead |
+| Clamped values | Defensive — values never go below 0 |
